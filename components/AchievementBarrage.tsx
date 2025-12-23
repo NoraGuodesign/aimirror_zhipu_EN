@@ -19,7 +19,7 @@ const AchievementBarrage: React.FC<Props> = ({ achievements, isActive }) => {
     // Default hint if empty
     const baseItems = achievements.length > 0 
       ? achievements 
-      : [{ id: 'hint', text: '记录每一个感恩时刻', date: new Date().toLocaleDateString() } as Achievement];
+      : [{ id: 'hint', text: 'Record every moment of gratitude', date: new Date().toLocaleDateString() } as Achievement];
 
     const newLanes: Achievement[][] = [[], []];
     

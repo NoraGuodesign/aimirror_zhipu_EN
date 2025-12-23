@@ -222,7 +222,7 @@ const VirtualKeyboard: React.FC<Props> = ({ onKeyPress, onBackspace, onCompositi
 
       <div className="flex gap-1 w-full">
         <Key 
-          label={view === 'pinyin' ? "123" : "拼音"} 
+          label={view === 'pinyin' ? "123" : "ABC"} 
           variant="functional" 
           onClick={() => {
             onUserActivity?.();
@@ -231,12 +231,12 @@ const VirtualKeyboard: React.FC<Props> = ({ onKeyPress, onBackspace, onCompositi
           className="w-[18%]" 
         />
         <Key 
-          label="空格" 
+          label="Space" 
           onClick={handleSpace} 
           className="flex-1 text-[12px] font-light text-gray-400" 
         />
         <Key 
-          label={pinyin ? "确认" : "发送"} 
+          label={pinyin ? "Confirm" : "Send"} 
           variant="accent" 
           onClick={handleActionClick} 
           className="w-[20%] text-[12px]" 
