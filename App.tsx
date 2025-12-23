@@ -381,7 +381,7 @@ const App: React.FC = () => {
                           </span>
                         ))}
                         {confirmedText === '' && !composition && !interimStt && (
-                          <span className="text-gray-300 absolute left-4 top-4 italic font-light">捕捉你的高光时刻...</span>
+                          <span className="text-gray-300 absolute left-4 top-4 italic font-light">Capture your highlight moments...</span>
                         )}
                       </div>
                       {isRecording && <div className="absolute top-4 right-4 flex items-center gap-2"><div className="w-2 h-2 bg-braun-accent rounded-full animate-ping"></div></div>}

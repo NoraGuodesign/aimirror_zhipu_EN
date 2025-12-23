@@ -2,18 +2,18 @@
 import { Achievement } from "../types.ts";
 
 export const DEFAULT_AFFIRMATIONS = [
-  "你是你人生的主角",
-  "你值得美好的事物",
-  "你总能如愿以偿",
-  "你被爱和支持包围着",
-  "你能克服任何挑战",
-  "你简直是全世界最好看的人",
-  "你的魅力威慑众生",
-  "你迷人到离谱",
-  "你散发着万人迷气质",
-  "你天生就是富贵命",
-  "你是金钱磁铁",
-  "你能够轻松吸引金钱"
+  "You are the lead in your own story.",
+  "You deserve beautiful things.",
+  "You always find a way to make it work.",
+  "You are surrounded by love and support.",
+  "You can overcome any challenge.",
+  "You are stunning beyond words.",
+  "Your charm is unforgettable.",
+  "You are captivating in the best way.",
+  "You radiate magnetic energy.",
+  "You are destined for abundance.",
+  "You are a magnet for opportunity.",
+  "You attract prosperity with ease."
 ];
 
 const ZHIPU_API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
@@ -84,13 +84,13 @@ export class GeminiService {
   }
 
   /**
-   * 智能拆分成就：识别无标点长句中的独立事件
+   * Intelligently splits achievements from long sentences without punctuation.
    */
   async parseAchievements(rawText: string): Promise<string[]> {
     try {
       if (!this.apiKey) {
         return rawText
-          .split(/[，。, \n]/)
+          .split(/[，。,.\n]/)
           .map(item => item.trim())
           .filter(item => item.length > 0)
           .map(item => this.normalizeAchievementText(item))
@@ -101,7 +101,7 @@ export class GeminiService {
           {
             role: "system",
             content:
-              "你是一个成就提取专家。用户像在和朋友聊天，请从文段中提取多个积极正面的“小事件”，每条保持简短、有行动结果。输出JSON字符串数组。如输入“今天好累但还是去跑步了，还做了沙拉”，输出[\"坚持跑步\",\"做了健康沙拉\"]。严禁输出Markdown文字，只输出JSON数组本身。",
+              "You are an achievement extraction expert. The user speaks casually like chatting with a friend. Extract multiple positive, actionable micro-achievements from the text. Keep each item short and outcome-focused. Output a JSON string array. Example input: \"I was tired but still went for a run and made a salad\" -> [\"Went for a run\",\"Made a healthy salad\"]. Do not output Markdown, only the JSON array itself.",
           },
           { role: "user", content: rawText },
         ],
@@ -116,7 +116,7 @@ export class GeminiService {
     } catch (error) {
       console.warn("Zhipu parse failed, falling back:", error);
       return rawText
-        .split(/[，。, \n]/)
+        .split(/[，。,.\n]/)
         .map(item => item.trim())
         .filter(item => item.length > 0)
         .map(item => this.normalizeAchievementText(item))
@@ -125,12 +125,12 @@ export class GeminiService {
   }
 
   /**
-   * 生成即时定制赞美
+   * Generates a tailored, instant compliment.
    */
   async generatePraise(achievements: Achievement[], lastInput?: string): Promise<string> {
     const fallback = () =>
       DEFAULT_AFFIRMATIONS[Math.floor(Math.random() * DEFAULT_AFFIRMATIONS.length)];
-    const context = lastInput || achievements.slice(-2).map(a => a.text).join("，");
+    const context = lastInput || achievements.slice(-2).map(a => a.text).join(", ");
     
     try {
       if (!this.apiKey) {
@@ -141,19 +141,19 @@ export class GeminiService {
           {
             role: "system",
             content:
-              "你是一个贴心的朋友。根据用户输入生成一句新的赞美，语气自然真诚、有针对性。避免机械套句或复述原话，禁止使用“你把xxx做得很棒”结构。必须以“你”开头，15-20字以内。直接输出文字，不要引号。",
+              "You are a caring friend. Create a new compliment based on the user's input. Keep the tone natural, sincere, and specific. Avoid clichés or simply echoing the input. Do not use the structure \"You did X so well.\" The output must start with \"You\" and be 15-20 words. Output plain text only, without quotes.",
           },
-          { role: "user", content: `根据输入给出夸奖：${context}` },
+          { role: "user", content: `Give a compliment based on: ${context}` },
         ],
         { temperature: 0.7, maxTokens: 64 },
       );
 
       let praiseText = content.trim().replace(/[“”、"']/g, "");
-      if (!praiseText.startsWith('你')) praiseText = '你' + praiseText;
-      if (/你把.+做[得的]很棒/.test(praiseText)) {
+      if (!praiseText.startsWith('You')) praiseText = `You ${praiseText}`;
+      if (/You did .+ so well/i.test(praiseText)) {
         return fallback();
       }
-      return praiseText.length > 25 ? praiseText.slice(0, 25) : praiseText;
+      return praiseText.length > 120 ? praiseText.slice(0, 120) : praiseText;
     } catch (error) {
       console.error("Zhipu praise generation error:", error);
       return fallback();
@@ -163,8 +163,8 @@ export class GeminiService {
   private normalizeAchievementText(text: string): string {
     const trimmed = text.replace(/[。！？!?,，]+/g, "").trim();
     const cleaned = trimmed
-      .replace(/^(我|今天|刚刚|刚才|然后|之后|后来|其实|就是|一下|一下子|又|还|只是|不过|但是|可是|而且|并且|于是|所以)\s*/g, "")
-      .replace(/(了|啦|呀|呢)$/g, "")
+      .replace(/^(I|Today|Just now|Just|Then|Afterwards|Later|Actually|A bit|Again|Also|Only|However|But|And|So)\s*/gi, "")
+      .replace(/\s*(today|just now|just)\s*$/gi, "")
       .trim();
     return cleaned || trimmed;
   }
